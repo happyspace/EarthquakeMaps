@@ -1,5 +1,6 @@
 package module1;
 
+import de.fhpotsdam.unfolding.providers.EsriProvider;
 import processing.core.PApplet;
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.geo.Location;
@@ -7,6 +8,7 @@ import de.fhpotsdam.unfolding.providers.AbstractMapProvider;
 import de.fhpotsdam.unfolding.providers.Google;
 import de.fhpotsdam.unfolding.providers.MBTilesMapProvider;
 import de.fhpotsdam.unfolding.utils.MapUtils;
+import processing.core.PImage;
 
 /** HelloWorld
   * An application with two maps side-by-side zoomed in on different locations.
@@ -43,10 +45,26 @@ public class HelloWorld extends PApplet
 
 		// This sets the background color for the Applet.  
 		// Play around with these numbers and see what happens!
-		this.background(200, 200, 200);
-		
-		// Select a map provider
+		this.background(0, 200, 0, 100);
+
+        // load this image from the resources folder.
+        PImage pImage = this.loadImage("palmTrees.jpg");
+        // image must be the same size as the applet.
+        pImage.resize(800, 600);
+        // image should be filtered see PApplet#background(PImage)
+        pImage.filter(OPAQUE);
+        pImage.filter(POSTERIZE, 20.0f);
+
+        // tints maps blue
+        // image(pImage, 0, 0);
+        // tint(0, 153, 204, 126);  // Tint blue and set transparency
+        // image(pImage, 50, 0);
+
+        //this.background(pImage);
+
+        // Select a map provider
 		AbstractMapProvider provider = new Google.GoogleTerrainProvider();
+        AbstractMapProvider provider1 = new EsriProvider.DeLorme();
 		// Set a zoom level
 		int zoomLevel = 10;
 		
@@ -70,9 +88,14 @@ public class HelloWorld extends PApplet
 		// The next line zooms in and centers the map at 
 	    // 32.9 (latitude) and -117.2 (longitude)
 	    map1.zoomAndPanTo(zoomLevel, new Location(32.9f, -117.2f));
-		
-		// This line makes the map interactive
+
+        map2 = new UnfoldingMap(this, 425, 50, 350, 500, provider1);
+
+        map2.zoomAndPanTo(zoomLevel, new Location(37.4996949f,-122.2620497f));
+
+        // This line makes the map interactive
 		MapUtils.createDefaultEventDispatcher(this, map1);
+        MapUtils.createDefaultEventDispatcher(this, map2);
 		
 		// TODO: Add code here that creates map2 
 		// Then you'll modify draw() below
@@ -84,6 +107,7 @@ public class HelloWorld extends PApplet
 		// So far we only draw map1...
 		// TODO: Add code so that both maps are displayed
 		map1.draw();
+        map2.draw();
 	}
 
 	
