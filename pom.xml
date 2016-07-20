@@ -155,6 +155,14 @@
           <systemPath>${project.basedir}/lib/unfolding.0.9.7-uscd.jar</systemPath>
       </dependency>
 
+      <dependency>
+          <groupId>json4processing</groupId>
+          <artifactId>ucsd.edu.json4processing</artifactId>
+          <version>1.0</version>
+          <scope>system</scope>
+          <systemPath>${project.basedir}/lib/json4processing.jar</systemPath>
+      </dependency>
+
 
 
   </dependencies>

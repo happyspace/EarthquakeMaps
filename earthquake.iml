@@ -95,5 +95,14 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Maven: json4processing:ucsd.edu.json4processing:1.0">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/json4processing.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

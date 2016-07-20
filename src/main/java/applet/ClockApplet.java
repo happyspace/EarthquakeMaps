@@ -22,12 +22,31 @@ public class ClockApplet extends PApplet {
         backgroundImg = this.loadImage("palmTrees.jpg");
     }
 
+    /** Return the RGB color of the sun at this number of hours in the day */
+    public int[] sunColorSec(float hours)
+    {
+        int[] rgb = new int[3];
+        // Scale the brightness of the yellow based on the hours.  0 hours
+        // is black.  12 hours is bright yellow.
+        float diffFrom12 = Math.abs(12-hours);
+
+        float ratio = diffFrom12/12;
+        rgb[0] = (int)(255*ratio);
+        rgb[1] = (int)(255*ratio);
+        rgb[2] = 0;
+
+        //System.out.println("R" + rgb[0] + " G" + rgb[1] + " B" + rgb[2]);
+        return rgb;
+    }
+
     @Override
     public void draw() {
         backgroundImg.resize(0, height);
         background(0);
         image(backgroundImg, 0, 0);
-        fill(255, 209, 0);
+        int[] color = sunColorSec(hour());		//calculate color code for sun
+        fill(color[0],color[1],color[2]);	//set sun color
+
         ellipse(width / 5, height / 5, width / 5, height / 5);
     }
 }
