@@ -33,8 +33,10 @@ public class LandQuakeMarker extends EarthquakeMarker {
 		// and how it is set in the EarthquakeMarker constructor
 		
 		// TODO: Implement this method
-		
-	}
+        final float radius = this.getRadius();
+        pg.ellipse(x, y, radius, radius);
+
+    }
 	
 
 	// Get the country the earthquake is in

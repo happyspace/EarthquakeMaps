@@ -4,6 +4,8 @@ import de.fhpotsdam.unfolding.data.PointFeature;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import processing.core.PGraphics;
 
+import java.awt.*;
+
 /** Implements a visual marker for earthquakes on an earthquake map
  * 
  * @author UC San Diego Intermediate Software Development MOOC team
@@ -33,7 +35,28 @@ public abstract class EarthquakeMarker extends SimplePointMarker
 	/** Greater than or equal to this threshold is a deep depth */
 	public static final float THRESHOLD_DEEP = 300;
 
+	public static final String RADIUS_PROP = "radius";
+
 	// ADD constants for colors
+    public static final Color red = new Color(255, 0, 0);
+    public static final Color yellow = new Color(255, 255, 0);
+    public static final Color blue = new Color(0, 0, 255);
+
+    public static enum EarthquakeAge{
+        HOUR("Past Hour"),
+        DAY("Past Day"),
+        MONTH("Past Month");
+
+        private final String age;
+
+        EarthquakeAge(String s) {
+            this.age = s;
+        }
+
+        public String getAge() {
+            return age;
+        }
+    }
 
 	
 	// abstract method implemented in derived classes
@@ -64,7 +87,13 @@ public abstract class EarthquakeMarker extends SimplePointMarker
 		// call abstract method implemented in child class to draw marker shape
 		drawEarthquake(pg, x, y);
 		
-		// OPTIONAL TODO: draw X over marker if within past day		
+		// OPTIONAL TODO: draw X over marker if within past day
+        if(this.isPastPeriod(EarthquakeAge.DAY)){
+            float half = radius/2 + 2;
+            pg.line(x - half, y - half, x + half, y + half);
+            pg.line(x + half, y - half, x - half, y + half);
+        }
+
 		
 		// reset to previous styling
 		pg.popStyle();
@@ -77,6 +106,18 @@ public abstract class EarthquakeMarker extends SimplePointMarker
 	// You might find the getters below helpful.
 	private void colorDetermine(PGraphics pg) {
 		//TODO: Implement this method
+        int color;
+        if(this.getDepth() <= EarthquakeMarker.THRESHOLD_INTERMEDIATE){
+            color = pg.color(EarthquakeMarker.yellow.getRGB());
+        }
+        else if (this.getDepth() > EarthquakeMarker.THRESHOLD_INTERMEDIATE &&
+                this.getDepth() <= EarthquakeMarker.THRESHOLD_DEEP) {
+            color = pg.color(EarthquakeMarker.blue.getRGB());
+        }
+        else {
+            color = pg.color(EarthquakeMarker.red.getRGB());
+        }
+        pg.fill(color);
 	}
 	
 	
@@ -100,6 +141,18 @@ public abstract class EarthquakeMarker extends SimplePointMarker
 	public float getRadius() {
 		return Float.parseFloat(getProperty("radius").toString());
 	}
+
+	public boolean isPastPeriod(EarthquakeAge targetAge){
+	    boolean ta = false;
+        if(getProperty("age") != null &&
+                getProperty("age").
+                        toString().
+                        equalsIgnoreCase(targetAge.getAge())){
+            ta = true;
+        }
+
+        return ta;
+    }
 	
 	public boolean isOnLand()
 	{

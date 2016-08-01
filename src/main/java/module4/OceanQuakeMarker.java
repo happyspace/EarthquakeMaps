@@ -30,7 +30,11 @@ public class OceanQuakeMarker extends EarthquakeMarker {
 		// and how it is set in the EarthquakeMarker constructor
 		
 		// TODO: Implement this method
-		
+		float radius = this.getRadius();
+		float half_radius = radius/2;
+
+		pg.rect(x - half_radius, y - half_radius, radius, radius);
+
 	}
 	
 
