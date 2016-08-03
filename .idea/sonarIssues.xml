@@ -3,6 +3,11 @@
   <component name="issues">
     <option name="index">
       <map>
+        <entry key="/fragment.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/src/main/java/module4/CityMarker.java">
           <value>
             <set />
@@ -24,6 +29,21 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/src/main/java/module4/OceanQuakeMarker.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/module5/CityMarker.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/module5/EarthquakeCityMap.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/module5/EarthquakeMarker.java">
           <value>
             <set />
           </value>

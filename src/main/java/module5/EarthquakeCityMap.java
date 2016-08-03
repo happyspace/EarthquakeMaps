@@ -1,8 +1,5 @@
 package module5;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.GeoJSONReader;
@@ -13,9 +10,13 @@ import de.fhpotsdam.unfolding.marker.Marker;
 import de.fhpotsdam.unfolding.marker.MultiMarker;
 import de.fhpotsdam.unfolding.providers.Google;
 import de.fhpotsdam.unfolding.providers.MBTilesMapProvider;
+import de.fhpotsdam.unfolding.utils.GeoUtils;
 import de.fhpotsdam.unfolding.utils.MapUtils;
 import parsing.ParseFeed;
 import processing.core.PApplet;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** EarthquakeCityMap
  * An application with an interactive map displaying earthquake data.
@@ -117,11 +118,17 @@ public class EarthquakeCityMap extends PApplet {
 	
 	
 	public void draw() {
-		background(0);
+		// background(0);
 		map.draw();
 		addKey();
-		
-	}
+
+        fill(255, 255, 255);
+        rect(300, 20, 25, 25);
+
+        fill(100, 100, 100, 100);
+        rect(350, 20, 25, 25);
+
+    }
 	
 	/** Event handler that gets called automatically when the 
 	 * mouse moves.
@@ -145,10 +152,32 @@ public class EarthquakeCityMap extends PApplet {
 	// 
 	private void selectMarkerIfHover(List<Marker> markers)
 	{
-		// TODO: Implement this method
-	}
-	
-	/** The event handler for mouse clicks
+        if(lastSelected == null) {
+            for (Marker marker : markers) {
+                if(marker.isInside(map, mouseX, mouseY)){
+                    marker.setSelected(true);
+                    lastSelected = (CommonMarker) marker;
+                    break;
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public void mouseReleased() {
+        if (mouseX > 300 && mouseX < 325
+                && mouseY > 20 && mouseY < 55) {
+            background(255, 255, 255);
+        } else if (mouseX > 350 && mouseX < 375
+                && mouseY > 20 && mouseY < 55) {
+            background(100, 100, 100);
+        }
+
+
+    }
+
+    /** The event handler for mouse clicks
 	 * It will display an earthquake and its threat circle of cities
 	 * Or if a city is clicked, it will display all the earthquakes 
 	 * where the city is in the threat circle
@@ -157,9 +186,103 @@ public class EarthquakeCityMap extends PApplet {
 	public void mouseClicked()
 	{
 		// TODO: Implement this method
-		// Hint: You probably want a helper method or two to keep this code
-		// from getting too long/disorganized
+		if(this.lastClicked == null){
+            Marker marker = this.selectMarkerIfClicked();
+            if (marker != null) {
+                lastClicked = (CommonMarker) marker;
+                lastClicked.setClicked(true);
+
+                if(marker instanceof CityMarker){
+                    // hide other cities
+                    this.hideOtherCities((CityMarker) marker);
+                    // hide all earthquakes outside the threat circle
+                    this.hideEarthquakesOutside((CityMarker) marker);
+                }
+                if (marker instanceof EarthquakeMarker) {
+                    // hide other earthquakes
+                    this.hideOtherEarthquakes((EarthquakeMarker) marker);
+                    // hide all cities outside the threat circle
+                    this.hideCitiesOutsideThreat((EarthquakeMarker) marker);
+                }
+            }
+        }
+        else {
+            this.lastClicked.setClicked(false);
+            this.lastClicked = null;
+            this.unhideMarkers();
+        }
 	}
+
+    private void hideCitiesOutsideThreat(EarthquakeMarker marker) {
+        double circle = marker.threatCircle();
+        for (Marker cityMarker : cityMarkers) {
+            double distance = GeoUtils.getDistance(marker.getLocation(), cityMarker.getLocation());
+            if (distance > circle){
+                cityMarker.setHidden(true);
+            }
+            else {
+                System.out.println(((CityMarker) cityMarker).getCity() +
+                        " circle " + circle + " dist " + distance);
+            }
+        }
+    }
+
+    private void hideOtherEarthquakes(EarthquakeMarker earthquakeMarker) {
+        for (Marker quakeMarker : quakeMarkers) {
+            // instance equality
+            if (earthquakeMarker != quakeMarker) {
+                quakeMarker.setHidden(true);
+            }
+        }
+    }
+
+
+
+    private void hideOtherCities(CityMarker cityMarker) {
+        for (Marker marker : cityMarkers) {
+            // instance equality
+            if(cityMarker != marker){
+                marker.setHidden(true);
+            }
+        }
+    }
+
+    private void hideEarthquakesOutside(CityMarker cityMarker){
+        for (Marker quakeMarker : quakeMarkers) {
+            EarthquakeMarker qm = (EarthquakeMarker)quakeMarker;
+            double circle = qm.threatCircle();
+            double distance = GeoUtils.getDistance(cityMarker.getLocation(), quakeMarker.getLocation());
+            if(distance > circle) {
+                quakeMarker.setHidden(true);
+            }
+            else {
+                System.out.println(((EarthquakeMarker) quakeMarker).getTitle() +
+                " circle " + circle + " dist " + distance);
+            }
+        }
+    }
+
+	private Marker selectMarkerIfClicked() {
+        Marker selectedMarker = null;
+        // process city markers first.
+        for (Marker cityMarker : cityMarkers) {
+            if (cityMarker.isInside(map, mouseX, mouseY)) {
+                selectedMarker = cityMarker;
+                break;
+            }
+        }
+
+        if (selectedMarker == null) {
+            for (Marker quakeMarker : quakeMarkers) {
+                if (quakeMarker.isInside(map, mouseX, mouseY)) {
+                    selectedMarker = quakeMarker;
+                    break;
+                }
+            }
+        }
+
+        return selectedMarker;
+    }
 	
 	
 	// loop over and unhide all markers
@@ -172,8 +295,15 @@ public class EarthquakeCityMap extends PApplet {
 			marker.setHidden(false);
 		}
 	}
-	
-	// helper method to draw key in GUI
+
+    @Override
+    public void keyPressed() {
+        if(key == 'w'){
+            background(255, 255, 255);
+        }
+    }
+
+    // helper method to draw key in GUI
 	private void addKey() {	
 		// Remember you can use Processing's graphics methods here
 		fill(255, 250, 240);
