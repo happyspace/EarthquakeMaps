@@ -1,9 +1,5 @@
 package module6;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.GeoJSONReader;
@@ -17,6 +13,11 @@ import de.fhpotsdam.unfolding.providers.MBTilesMapProvider;
 import de.fhpotsdam.unfolding.utils.MapUtils;
 import parsing.ParseFeed;
 import processing.core.PApplet;
+import processing.core.PGraphics;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /** EarthquakeCityMap
  * An application with an interactive map displaying earthquake data.
@@ -64,6 +65,7 @@ public class EarthquakeCityMap extends PApplet {
 	// NEW IN MODULE 5
 	private CommonMarker lastSelected;
 	private CommonMarker lastClicked;
+    private PGraphics textPG;
 	
 	public void setup() {		
 		// (1) Initializing canvas and map tiles
@@ -78,6 +80,7 @@ public class EarthquakeCityMap extends PApplet {
 		    //earthquakesURL = "2.5_week.atom";
 		}
 		MapUtils.createDefaultEventDispatcher(this, map);
+        textPG = createGraphics(850, 650);
 		
 		// FOR TESTING: Set earthquakesURL to be one of the testing files by uncommenting
 		// one of the lines below.  This will work whether you are online or offline
@@ -85,7 +88,7 @@ public class EarthquakeCityMap extends PApplet {
 		//earthquakesURL = "test2.atom";
 		
 		// Uncomment this line to take the quiz
-		//earthquakesURL = "quiz2.atom";
+		earthquakesURL = "quiz2.atom";
 		
 		
 		// (2) Reading in earthquake data and geometric properties
@@ -117,6 +120,7 @@ public class EarthquakeCityMap extends PApplet {
 
 	    // could be used for debugging
 	    printQuakes();
+        sortAndPrint(1000);
 	 		
 	    // (3) Add markers to map
 	    //     NOTE: Country markers are not added to the map.  They are used
@@ -132,13 +136,34 @@ public class EarthquakeCityMap extends PApplet {
 		background(0);
 		map.draw();
 		addKey();
-		
-	}
-	
-	
+
+        if (this.lastSelected != null && lastSelected.isSelected()) {
+            textPG.clear();
+            // PGraphics pg = map.mapDisplay.getOuterPG();
+            lastSelected.showTitle(textPG, mouseX, mouseY);
+            image(textPG, 0, 0);
+        }
+
+
+
+    }
+
+
 	// TODO: Add the method:
 	//   private void sortAndPrint(int numToPrint)
 	// and then call that method from setUp
+	private void sortAndPrint(int numToPrint) {
+		EarthquakeMarker[] markers = quakeMarkers.toArray(new EarthquakeMarker[0] );
+		Arrays.sort(markers);
+		if (numToPrint > markers.length) {
+			numToPrint = markers.length;
+		}
+		for (int i = 0; i < numToPrint; i++) {
+            EarthquakeMarker marker = markers[i];
+
+            System.out.println(marker.getTitle() + " " + marker.getMagnitude());
+        }
+	}
 	
 	/** Event handler that gets called automatically when the 
 	 * mouse moves.
